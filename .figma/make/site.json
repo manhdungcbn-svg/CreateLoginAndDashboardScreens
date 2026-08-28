@@ -1,0 +1,10 @@
+{
+  "description": "Provides a modern 3D-styled login window and dashboard interface designed for enhanced user experience and intuitive navigation.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
