@@ -10,7 +10,7 @@ import {
   Legend,
 } from "recharts";
 
-type Page = "login" | "dashboard" | "phieu" | "khachhang" | "sanpham" | "baocao" | "ai";
+type Page = "landing" | "login" | "dashboard" | "phieu" | "khachhang" | "sanpham" | "baocao" | "ai";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 const Icon = {
@@ -198,8 +198,386 @@ function Chart3D() {
   );
 }
 
+// ─── 3D Pillars ───────────────────────────────────────────────────────────────
+function Pillars3D() {
+  const pillars = [
+    { h: 260, x: 0, delay: 0, bright: false },
+    { h: 340, x: 56, delay: 0.15, bright: true },
+    { h: 300, x: 112, delay: 0.3, bright: false },
+    { h: 380, x: 168, delay: 0.1, bright: true },
+    { h: 220, x: 224, delay: 0.25, bright: false },
+  ];
+  return (
+    <div className="relative" style={{ width: 280, height: 400, perspective: "800px" }}>
+      <div style={{ transformStyle: "preserve-3d", transform: "rotateX(12deg) rotateY(-8deg)" }}>
+        {pillars.map((p, i) => {
+          const faceW = 44;
+          const topH = 14;
+          const sideW = 16;
+          const glow = p.bright ? "rgba(249,115,22,0.9)" : "rgba(200,80,10,0.75)";
+          const topGlow = p.bright ? "rgba(255,160,60,0.95)" : "rgba(220,110,30,0.8)";
+          const sideColor = p.bright ? "rgba(160,50,5,0.9)" : "rgba(100,35,5,0.85)";
+          return (
+            <div key={i} className="absolute bottom-0"
+              style={{
+                left: p.x,
+                animation: `float ${2.8 + i * 0.3}s ease-in-out ${p.delay}s infinite`,
+              }}>
+              {/* Front face */}
+              <div style={{
+                width: faceW, height: p.h,
+                background: `linear-gradient(180deg, ${topGlow} 0%, ${glow} 40%, rgba(100,35,5,0.6) 100%)`,
+                borderRadius: "2px 2px 0 0",
+                boxShadow: p.bright ? `0 0 40px rgba(249,115,22,0.5), inset 0 0 20px rgba(255,200,100,0.1)` : `0 0 20px rgba(180,70,10,0.2)`,
+                position: "relative",
+              }}>
+                {/* Vertical light streak */}
+                <div style={{
+                  position: "absolute", top: 0, left: "30%", width: "20%", height: "60%",
+                  background: "linear-gradient(180deg, rgba(255,220,140,0.4) 0%, transparent 100%)",
+                  borderRadius: 2,
+                }} />
+                {/* Horizontal bands */}
+                {[0.2, 0.4, 0.6, 0.8].map((pos, j) => (
+                  <div key={j} style={{
+                    position: "absolute", top: `${pos * 100}%`, left: 0, right: 0, height: 1,
+                    background: "rgba(255,180,80,0.15)",
+                  }} />
+                ))}
+              </div>
+              {/* Top face */}
+              <div style={{
+                position: "absolute",
+                top: -topH + 2, left: sideW * 0.5,
+                width: faceW, height: topH,
+                background: `linear-gradient(135deg, rgba(255,200,80,0.95), ${topGlow})`,
+                transform: "skewX(-45deg)",
+                transformOrigin: "bottom left",
+                borderRadius: "2px 2px 0 0",
+                boxShadow: p.bright ? "0 -4px 20px rgba(255,180,60,0.6)" : "none",
+              }} />
+              {/* Right side */}
+              <div style={{
+                position: "absolute",
+                top: -(topH - 2), left: faceW,
+                width: sideW, height: p.h + topH,
+                background: `linear-gradient(180deg, rgba(120,45,5,0.9), ${sideColor})`,
+                transform: "skewY(45deg)",
+                transformOrigin: "top left",
+              }} />
+            </div>
+          );
+        })}
+      </div>
+      {/* Ground glow */}
+      <div style={{
+        position: "absolute", bottom: -20, left: "50%", transform: "translateX(-50%)",
+        width: 300, height: 60,
+        background: "radial-gradient(ellipse, rgba(249,115,22,0.3) 0%, transparent 70%)",
+        filter: "blur(12px)",
+        pointerEvents: "none",
+      }} />
+    </div>
+  );
+}
+
+// ─── Landing Page ─────────────────────────────────────────────────────────────
+function LandingPage({ onLogin, onDemo }: { onLogin: () => void; onDemo: () => void }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  return (
+    <div className="min-h-screen w-full relative overflow-hidden flex flex-col"
+      style={{ background: "radial-gradient(ellipse 100% 80% at 50% -5%, #1c0800 0%, #0a0a0b 55%)" }}>
+
+      {/* Star field */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {Array.from({ length: 60 }).map((_, i) => (
+          <div key={i} className="absolute rounded-full"
+            style={{
+              width: Math.random() * 2 + 1, height: Math.random() * 2 + 1,
+              top: `${Math.random() * 70}%`, left: `${Math.random() * 100}%`,
+              background: "rgba(255,255,255,0.6)",
+              opacity: Math.random() * 0.6 + 0.2,
+              animation: `pulse-glow ${2 + Math.random() * 3}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 4}s`,
+            }} />
+        ))}
+        {/* Red ambient particles */}
+        {[
+          { top: "20%", left: "10%", size: 6, color: "rgba(239,68,68,0.7)" },
+          { top: "60%", left: "5%", size: 4, color: "rgba(249,115,22,0.6)" },
+          { top: "35%", right: "8%", size: 5, color: "rgba(239,68,68,0.5)" },
+          { top: "75%", right: "12%", size: 3, color: "rgba(249,115,22,0.4)" },
+        ].map((p, i) => (
+          <div key={i} className="absolute rounded-full"
+            style={{
+              width: p.size, height: p.size,
+              top: p.top, left: (p as any).left, right: (p as any).right,
+              background: p.color,
+              filter: "blur(1px)",
+              animation: `float ${3 + i}s ease-in-out infinite`,
+              animationDelay: `${i * 0.7}s`,
+            }} />
+        ))}
+      </div>
+
+      {/* Navbar */}
+      <nav className="relative z-20 flex items-center justify-between px-8 py-5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-4 h-4 rounded-full animate-pulse" style={{ background: "#f97316", boxShadow: "0 0 8px rgba(249,115,22,0.8)" }} />
+          <span className="text-white font-bold text-lg tracking-tight">WarrantyHub</span>
+        </div>
+        <div className="hidden md:flex items-center gap-8">
+          {["Sản phẩm", "Cách hoạt động", "Bảng giá", "Tài liệu"].map(item => (
+            <button key={item} className="text-sm text-zinc-400 hover:text-white transition-colors">{item}</button>
+          ))}
+        </div>
+        <button onClick={onLogin}
+          className="hidden md:flex items-center px-5 py-2 rounded-full text-sm font-semibold text-white transition-all hover:scale-[1.03]"
+          style={{
+            background: "transparent",
+            border: "1.5px solid rgba(255,255,255,0.25)",
+            backdropFilter: "blur(8px)",
+          }}>
+          Đăng nhập
+        </button>
+        <button className="md:hidden text-zinc-300" onClick={() => setMenuOpen(!menuOpen)}>
+          <Icon.menu />
+        </button>
+      </nav>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="md:hidden relative z-20 mx-4 mb-4 p-4 rounded-2xl space-y-3"
+          style={{ background: "rgba(17,17,20,0.95)", border: "1px solid rgba(255,255,255,0.1)" }}>
+          {["Sản phẩm", "Cách hoạt động", "Bảng giá", "Tài liệu"].map(item => (
+            <div key={item} className="text-sm text-zinc-300 py-2">{item}</div>
+          ))}
+          <button onClick={onLogin} className="w-full py-2.5 rounded-xl text-sm font-semibold text-white"
+            style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}>Đăng nhập</button>
+        </div>
+      )}
+
+      {/* Hero */}
+      <div className="relative z-10 flex flex-col items-center flex-1 pt-8 pb-16 px-4">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-10"
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            backdropFilter: "blur(8px)",
+          }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+          <span className="text-[11px] font-semibold tracking-widest text-zinc-300 uppercase">Phiên bản 3.0 · Cập nhật hôm nay</span>
+        </div>
+
+        {/* Main layout: floating cards + 3D + text */}
+        <div className="relative w-full max-w-5xl mx-auto">
+          {/* Left floating cards */}
+          <div className="absolute left-0 top-8 hidden lg:flex flex-col gap-4 z-20" style={{ width: 220 }}>
+            {/* Phiếu BH card */}
+            <div className="rounded-2xl p-4 animate-float" style={{
+              background: "rgba(17,17,20,0.88)",
+              border: "1px solid rgba(249,115,22,0.25)",
+              backdropFilter: "blur(16px)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+            }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] font-bold tracking-widest text-zinc-400 uppercase">Phiếu BH</span>
+                <span className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded-full font-semibold"
+                  style={{ background: "rgba(249,115,22,0.15)", color: "#f97316" }}>
+                  <span className="w-1 h-1 rounded-full bg-orange-400 inline-block animate-pulse" />Live
+                </span>
+              </div>
+              <div className="text-3xl font-black text-white">+248</div>
+              <div className="text-[10px] text-zinc-500 mt-0.5">Tổng phiếu trong tháng</div>
+              <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: "rgba(249,115,22,0.15)" }}>
+                <div className="h-full rounded-full" style={{ width: "75%", background: "linear-gradient(90deg, #f97316, #fb923c)" }} />
+              </div>
+            </div>
+
+            {/* AI Analysis card */}
+            <div className="rounded-2xl p-3.5 animate-float" style={{
+              background: "rgba(17,17,20,0.88)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              backdropFilter: "blur(16px)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+              animationDelay: "0.8s",
+            }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] font-bold tracking-widest text-zinc-400 uppercase">Phân tích AI</span>
+                <span className="text-[9px] px-2 py-0.5 rounded-full font-semibold"
+                  style={{ background: "rgba(167,139,250,0.2)", color: "#a78bfa" }}>New</span>
+              </div>
+              <p className="text-[11px] text-zinc-300 leading-[1.5]">
+                Lỗi <strong className="text-white">màn hình</strong> chiếm 34% — đề xuất tăng ca sáng cho kỹ thuật viên.
+              </p>
+              <div className="mt-2.5 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                <div className="h-full rounded-full" style={{ width: "34%", background: "#a78bfa" }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Center: headline + 3D */}
+          <div className="flex flex-col items-center text-center px-4">
+            <div className="relative mb-2" style={{ minHeight: 360 }}>
+              {/* 3D Pillars behind text */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
+                <div style={{ opacity: 0.9, filter: "drop-shadow(0 0 40px rgba(249,115,22,0.4))" }}>
+                  <Pillars3D />
+                </div>
+              </div>
+              {/* Headline text overlaid */}
+              <div className="relative z-10 pt-6">
+                <h1 className="font-black leading-none" style={{ fontSize: "clamp(48px, 8vw, 90px)" }}>
+                  <span className="text-white block">Bảo hành</span>
+                  <span className="block" style={{
+                    background: "linear-gradient(90deg, #f97316, #fb923c, #fdba74)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}>thông minh,</span>
+                  <span className="text-white block">vận hành</span>
+                  <span className="block" style={{
+                    background: "linear-gradient(90deg, #f97316, #fb923c)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}>tự động.</span>
+                </h1>
+              </div>
+            </div>
+
+            {/* Subtext */}
+            <p className="text-zinc-400 text-base leading-7 max-w-xl mt-2">
+              WarrantyHub giúp doanh nghiệp của bạn <strong className="text-white">quản lý 100% vòng đời bảo hành</strong> — từ tiếp nhận, phân loại lỗi tự động bằng AI, đến đóng phiếu và xuất báo cáo — chỉ trong một bảng điều khiển duy nhất.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex items-center gap-4 mt-8 flex-wrap justify-center">
+              <button onClick={onLogin}
+                className="flex items-center gap-2 px-7 py-3.5 rounded-full text-base font-bold text-white transition-all hover:scale-[1.04] hover:brightness-110"
+                style={{
+                  background: "linear-gradient(135deg, #f97316, #ea580c)",
+                  boxShadow: "0 8px 32px rgba(249,115,22,0.45)",
+                }}>
+                Khởi động miễn phí <span>→</span>
+              </button>
+              <button onClick={onDemo}
+                className="flex items-center gap-2.5 px-7 py-3.5 rounded-full text-base font-semibold text-zinc-200 transition-all hover:text-white hover:scale-[1.02]"
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1.5px solid rgba(255,255,255,0.15)",
+                  backdropFilter: "blur(8px)",
+                }}>
+                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs" style={{ background: "rgba(255,255,255,0.12)" }}>▷</span>
+                Xem demo
+              </button>
+            </div>
+          </div>
+
+          {/* Right floating cards */}
+          <div className="absolute right-0 top-8 hidden lg:flex flex-col gap-4 z-20" style={{ width: 220 }}>
+            {/* Processing time card */}
+            <div className="rounded-2xl p-4 animate-float" style={{
+              background: "rgba(17,17,20,0.88)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              backdropFilter: "blur(16px)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+              animationDelay: "1.5s",
+            }}>
+              <div className="text-[9px] font-bold tracking-widest text-zinc-400 uppercase mb-2">Thời gian xử lý TB</div>
+              <div className="text-3xl font-black text-white">2.4<span className="text-base font-semibold text-zinc-300 ml-0.5">ngày</span></div>
+              <div className="text-[10px] text-emerald-400 mt-1 font-medium">↓ Giảm 38% so với quý trước</div>
+              <div className="flex items-end gap-0.5 mt-3 h-8">
+                {[30, 50, 40, 60, 45, 55, 70, 60, 80].map((v, i) => (
+                  <div key={i} className="flex-1 rounded-sm transition-all"
+                    style={{
+                      height: `${v}%`,
+                      background: i === 8 ? "#f97316" : `rgba(249,115,22,${0.2 + i * 0.03})`,
+                    }} />
+                ))}
+              </div>
+            </div>
+
+            {/* On-time completion card */}
+            <div className="rounded-2xl p-4 animate-float" style={{
+              background: "rgba(17,17,20,0.88)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              backdropFilter: "blur(16px)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+              animationDelay: "2s",
+            }}>
+              <div className="text-[9px] font-bold tracking-widest text-zinc-400 uppercase mb-2">Hoàn tất đúng hạn</div>
+              <div className="text-3xl font-black text-white">92<span className="text-base font-semibold text-zinc-300">%</span></div>
+              <div className="text-[10px] text-zinc-500 mt-1">Đạt KPI tháng 8</div>
+              <div className="flex items-end gap-0.5 mt-3 h-8">
+                {[50, 40, 60, 50, 70, 60, 80, 70, 90].map((v, i) => (
+                  <div key={i} className="flex-1 rounded-sm"
+                    style={{
+                      height: `${v}%`,
+                      background: i === 8 ? "#f97316" : `rgba(249,115,22,${0.2 + i * 0.03})`,
+                    }} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Trust strip */}
+        <div className="mt-12 flex items-center gap-6 flex-wrap justify-center">
+          {[
+            { icon: "🏢", label: "500+ doanh nghiệp" },
+            { icon: "🎫", label: "2M+ phiếu xử lý" },
+            { icon: "⭐", label: "4.9/5 đánh giá" },
+            { icon: "🔒", label: "Bảo mật ISO 27001" },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-full"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <span className="text-sm">{item.icon}</span>
+              <span className="text-[11px] font-medium text-zinc-400">{item.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Feature highlights */}
+        <div className="mt-16 w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
+          {[
+            { icon: "🤖", title: "AI phân loại lỗi", desc: "Tự động nhận diện và phân loại lỗi sản phẩm với độ chính xác 94%", color: "#a78bfa" },
+            { icon: "⚡", title: "Xử lý thời gian thực", desc: "Dashboard realtime, cập nhật trạng thái phiếu ngay khi có thay đổi", color: "#f97316" },
+            { icon: "📊", title: "Báo cáo thông minh", desc: "Xuất báo cáo PDF/Excel, phân tích xu hướng và dự báo chi phí", color: "#22c55e" },
+          ].map((f, i) => (
+            <div key={i} className="p-5 rounded-2xl group cursor-pointer transition-all hover:scale-[1.02]"
+              style={{
+                background: "rgba(17,17,20,0.7)",
+                border: `1px solid ${f.color}22`,
+                backdropFilter: "blur(12px)",
+              }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-4"
+                style={{ background: `${f.color}22` }}>{f.icon}</div>
+              <h3 className="text-sm font-bold text-white mb-2">{f.title}</h3>
+              <p className="text-[12px] text-zinc-400 leading-5">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="relative z-10 flex items-center justify-between px-8 py-5"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ background: "#f97316" }} />
+          <span className="text-xs text-zinc-500 font-semibold">WarrantyHub © 2026</span>
+        </div>
+        <div className="flex items-center gap-5">
+          {["Điều khoản", "Bảo mật", "Liên hệ"].map(l => (
+            <button key={l} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">{l}</button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Login Page ───────────────────────────────────────────────────────────────
-function LoginPage({ onLogin }: { onLogin: () => void }) {
+function LoginPage({ onLogin, onBack }: { onLogin: () => void; onBack?: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -286,16 +664,24 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
           backdropFilter: "blur(20px)",
           boxShadow: "0 0 80px rgba(249,115,22,0.1), 0 32px 64px rgba(0,0,0,0.5)"
         }}>
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center animate-pulse-glow"
-              style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}>
-              <span className="text-white font-black text-base">W</span>
+          {/* Logo + back */}
+          <div className="flex items-center justify-between gap-3 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center animate-pulse-glow"
+                style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}>
+                <span className="text-white font-black text-base">W</span>
+              </div>
+              <div>
+                <div className="text-white font-bold text-lg leading-tight">WarrantyHub</div>
+                <div className="text-[11px] text-zinc-500">Quản lý bảo hành</div>
+              </div>
             </div>
-            <div>
-              <div className="text-white font-bold text-lg leading-tight">WarrantyHub</div>
-              <div className="text-[11px] text-zinc-500">Quản lý bảo hành</div>
-            </div>
+            {onBack && (
+              <button onClick={onBack}
+                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors flex items-center gap-1">
+                ← Trang chủ
+              </button>
+            )}
           </div>
 
           <div className="mb-6">
@@ -1083,6 +1469,7 @@ function AIPage() {
 
 // ─── Dashboard layout ─────────────────────────────────────────────────────────
 const pageTitles: Record<Page, string> = {
+  landing: "",
   login: "",
   dashboard: "Tổng quan",
   phieu: "Phiếu bảo hành",
@@ -1112,10 +1499,18 @@ function DashboardLayout({ page, setPage }: { page: Page; setPage: (p: Page) => 
 
 // ─── Root ──────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [page, setPage] = useState<Page>("login");
+  const [page, setPage] = useState<Page>("landing");
 
+  if (page === "landing") {
+    return (
+      <LandingPage
+        onLogin={() => setPage("login")}
+        onDemo={() => setPage("dashboard")}
+      />
+    );
+  }
   if (page === "login") {
-    return <LoginPage onLogin={() => setPage("dashboard")} />;
+    return <LoginPage onLogin={() => setPage("dashboard")} onBack={() => setPage("landing")} />;
   }
   return <DashboardLayout page={page} setPage={setPage} />;
 }
